@@ -4,8 +4,21 @@ import mongoose from "mongoose";
 import YachtRoute from "./Routes/YachtRoute.js";
 import userRoute from "./Routes/UserRoute.js";
 import BookingsRoute from "./Routes/BookingRoute.js";
+import swaggerUi from "swagger-ui-express";
+import { swaggerSpec } from "./configs/swagger.js";
 const app = express();
 app.use(express.json());
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+    customCssUrl: "https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui.css",
+    customJs: [
+        "https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-bundle.js",
+        "https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-standalone-preset.js",
+    ],
+    customSiteTitle: "Yacht Booking API",
+}));
+app.get("/api-docs.json", (req, res) => {
+    res.json(swaggerSpec);
+});
 // Database connection
 let connectionPromise = null;
 const connectDB = async () => {

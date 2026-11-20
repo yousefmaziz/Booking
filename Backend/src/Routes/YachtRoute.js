@@ -8,7 +8,7 @@ const router = express.Router();
 router.get("/", getAllYachts);
 router.post("/", authMiddleware, adminMiddleware, validateMiddleware(createYachtSchema), createYacht);
 router.get("/:id", validateMiddleware(yachtIdParamsSchema, "params"), getYachtById);
-router.put("/:id", authMiddleware, adminMiddleware, updateYacht);
-router.delete("/:id", authMiddleware, adminMiddleware, deleteYacht);
+router.put("/:id", authMiddleware, adminMiddleware, validateMiddleware(yachtIdParamsSchema, "params"), validateMiddleware(updateYachtSchema), updateYacht);
+router.delete("/:id", authMiddleware, adminMiddleware, validateMiddleware(yachtIdParamsSchema, "params"), deleteYacht);
 export default router;
 //# sourceMappingURL=YachtRoute.js.map

@@ -37,10 +37,16 @@ router.put(
   "/:id",
   authMiddleware,
   adminMiddleware,
-
+  validateMiddleware(yachtIdParamsSchema, "params"),
+  validateMiddleware(updateYachtSchema),
   updateYacht,
 );
-
-router.delete("/:id", authMiddleware, adminMiddleware, deleteYacht);
+router.delete(
+  "/:id",
+  authMiddleware,
+  adminMiddleware,
+  validateMiddleware(yachtIdParamsSchema, "params"),
+  deleteYacht,
+);
 
 export default router;
