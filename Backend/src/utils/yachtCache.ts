@@ -2,12 +2,9 @@ import { redisClient } from "../configs/redis.js";
 
 export const invalidateYachtsCache = async () => {
   try {
-    if (!redisClient.isReady) {
-      console.warn("Redis unavailable, cache invalidation skipped");
-      return;
-    }
-
     await redisClient.del("yachts:all");
+
+    console.log("CACHE INVALIDATED");
   } catch (error) {
     console.error("Cache invalidation failed:", error);
   }

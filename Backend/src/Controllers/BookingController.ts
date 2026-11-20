@@ -74,7 +74,7 @@ export const cancelBooking = async (req: Request, res: Response) => {
     });
   }
 
-  if (!bookingId) {
+  if (typeof bookingId !== "string" || !bookingId) {
     return res.status(400).json({
       message: "Booking ID is required",
     });

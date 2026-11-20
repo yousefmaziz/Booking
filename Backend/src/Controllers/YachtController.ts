@@ -39,17 +39,15 @@ export const getAllYachts = async (req: Request, res: Response) => {
 
     // 1. Try reading from Redis
     try {
-      if (redisClient.isReady) {
-        const cachedYachts = await redisClient.get(cacheKey);
+      const cachedYachts = await redisClient.get(cacheKey);
 
-        if (cachedYachts) {
-          console.log("CACHE HIT");
+      if (cachedYachts !== null) {
+        console.log("CACHE HIT");
 
-          return res.status(200).json(JSON.parse(cachedYachts));
-        }
-
-        console.log("CACHE MISS");
+        return res.status(200).json(cachedYachts);
       }
+
+      console.log("CACHE MISS");
     } catch (error) {
       console.error("Redis read failed:", error);
     }
@@ -59,9 +57,7 @@ export const getAllYachts = async (req: Request, res: Response) => {
 
     // 3. Try storing data in Redis
     try {
-      if (redisClient.isReady) {
-        await redisClient.setEx(cacheKey, 60, JSON.stringify(yachts));
-      }
+      await redisClient.set(cacheKey, yachts, { ex: 60 });
     } catch (error) {
       console.error("Redis write failed:", error);
     }
@@ -76,7 +72,12 @@ export const getAllYachts = async (req: Request, res: Response) => {
 };
 export const getYachtById = async (req: Request, res: Response) => {
   try {
-    const yacht = await getYachtByIdService(req.params.id);
+    const id = req.params.id;
+    if (typeof id !== "string") {
+      return res.status(400).json({ error: "Invalid yacht ID" });
+    }
+
+    const yacht = await getYachtByIdService(id);
     if (!yacht) {
       return res.status(404).json({ error: "Yacht not found" });
     }
@@ -90,7 +91,12 @@ export const getYachtById = async (req: Request, res: Response) => {
 
 export const updateYacht = async (req: Request, res: Response) => {
   try {
-    const updatedYacht = await updateYachtService(req.params.id, req.body);
+    const id = req.params.id;
+    if (typeof id !== "string") {
+      return res.status(400).json({ error: "Invalid yacht ID" });
+    }
+
+    const updatedYacht = await updateYachtService(id, req.body);
     if (!updatedYacht) {
       return res.status(404).json({ error: "Yacht not found" });
     }
@@ -107,7 +113,7 @@ export const updateYacht = async (req: Request, res: Response) => {
 
 export const deleteYacht = async (req: Request, res: Response) => {
   try {
-    const deletedYacht = await deleteYachtService(req.params.id);
+    const deletedYacht = await deleteYachtService(req.params.id as string);
     if (!deletedYacht) {
       return res.status(404).json({ error: "Yacht not found" });
     }
